@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevMind AI — Your Intelligent Coding Partner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #0B0F1A;
+      --surface: #131929;
+      --border: #1E2D45;
+      --accent: #00D4FF;
+      --accent2: #7C3AED;
+      --success: #00E87A;
+      --warn: #FFB347;
+      --text: #E8EDF5;
+      --muted: #6B7FA3;
+      --code-bg: #0D1525;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(11, 15, 26, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+    }
+
+    .logo span {
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: .55rem 1.3rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    .nav-cta:hover {
+      opacity: .85;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 212, 255, .12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: .35rem 1rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero-badge::before {
+      content: '●';
+      font-size: .5rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.2rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p {
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      padding: .75rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: transform .15s, opacity .2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      opacity: .9;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      padding: .75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+    }
+
+    /* ── LIVE DEMO ── */
+    .demo-section {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .75rem;
+      color: var(--accent);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+
+    .demo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--code-bg);
+    }
+
+    .tab {
+      padding: .75rem 1.25rem;
+      font-size: .85rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: color .2s, border-bottom .2s;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 1.5rem;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Tool: Code Explainer */
+    .tool-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .code-input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .85rem;
+      resize: vertical;
+      min-height: 140px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .code-input:focus {
+      border-color: var(--accent);
+    }
+
+    .tool-btn {
+      background: var(--accent2);
+      color: #fff;
+      border: none;
+      padding: .65rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: opacity .2s;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    .tool-btn:hover {
+      opacity: .85;
+    }
+
+    .tool-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .ai-output {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 80px;
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .ai-output .placeholder {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Tool: Bug Fixer */
+    .bug-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .bug-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .col-label {
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: .4rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    /* Tool: Code Generator */
+    .gen-row {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+
+    .prompt-input {
+      flex: 1;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .prompt-input:focus {
+      border-color: var(--accent);
+    }
+
+    .lang-select {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .75rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .85rem;
+      outline: none;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      max-width: 1000px;
+      margin: 5rem auto;
+      padding: 0 2rem;
+    }
+
+    .features h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .features h2 span {
+      color: var(--accent);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: .75rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: .4rem;
+    }
+
+    .feature-card p {
+      font-size: .87rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── PRICING ── */
+    .pricing {
+      max-width: 900px;
+      margin: 5rem auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .pricing h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: .75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .pricing p {
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .plan {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      text-align: left;
+      transition: border-color .2s;
+    }
+
+    .plan.popular {
+      border-color: var(--accent);
+      position: relative;
+    }
+
+    .plan.popular::before {
+      content: 'MOST POPULAR';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: var(--bg);
+      font-size: .65rem;
+      font-weight: 700;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .08em;
+    }
+
+    .plan-name {
+      font-size: .8rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+
+    .plan-price {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .plan-price sup {
+      font-size: 1rem;
+      vertical-align: super;
+    }
+
+    .plan-price sub {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .plan ul {
+      list-style: none;
+      margin: 1.25rem 0;
+    }
+
+    .plan ul li {
+      font-size: .875rem;
+      color: var(--muted);
+      padding: .35rem 0;
+      display: flex;
+      gap: .5rem;
+      align-items: flex-start;
+    }
+
+    .plan ul li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .plan-btn {
+      width: 100%;
+      padding: .7rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    .plan-btn.outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .plan-btn.filled {
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+    }
+
+    .plan-btn:hover {
+      opacity: .85;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    footer .logo {
+      display: inline-block;
+      margin-bottom: .5rem;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Dev<span>Mind</span><span style="color:var(--accent2)">.</span>ai</div>
+    <ul class="nav-links">
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Try
+      Free</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">AI-Powered · Powered by Claude</div>
+    <h1>Code faster.<br /><em>Think smarter.</em><br />Ship better.</h1>
+    <p>DevMind AI is your intelligent coding partner — explain, fix, generate, and review code in seconds using real AI,
+      right in your browser.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Try the
+        AI Tools →</button>
+      <button class="btn-ghost" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See
+        Pricing</button>
+    </div>
+  </section>
+
+  <!-- LIVE AI TOOLS -->
+  <section class="demo-section" id="tools">
+    <div class="section-label">// Live AI Tools — powered by Claude</div>
+    <div class="demo-card">
+      <div class="demo-tabs">
+        <button class="tab active" onclick="switchTab('explain', this)">🔍 Explain Code</button>
+        <button class="tab" onclick="switchTab('fix', this)">🐛 Fix Bugs</button>
+        <button class="tab" onclick="switchTab('generate', this)">⚡ Generate Code</button>
+      </div>
+
+      <!-- EXPLAIN TAB -->
+      <div class="tab-content active" id="tab-explain">
+        <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem;">Paste any code snippet and get a
+          plain-English explanation instantly.</p>
+        <div class="tool-row">
+          <textarea class="code-input" id="explain-input" placeholder="// Paste your code here...
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}"></textarea>
+          <button class="tool-btn" id="explain-btn" onclick="runExplain()">Explain →</button>
+        </div>
+        <div class="ai-output" id="explain-output"><span class="placeholder">Your explanation will appear here…</span>
+        </div>
+      </div>
+
+      <!-- FIX TAB -->
+      <div class="tab-content" id="tab-fix">
+        <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem;">Paste buggy code and let the AI identify and
+          fix the issues.</p>
+        <div class="bug-grid">
+          <div>
+            <div class="col-label">Buggy Code</div>
+            <textarea class="code-input" id="fix-input" style="min-height:160px" placeholder="// Paste your buggy code here...
+for (let i = 0; i =< 5; i++) {
+  console.log(i)
+}"></textarea>
+          </div>
+          <div>
+            <div class="col-label">Fixed Code</div>
+            <div class="ai-output" id="fix-output"
+              style="min-height:160px;font-family:'JetBrains Mono',monospace;font-size:.82rem"><span
+                class="placeholder">Fixed code will appear here…</span></div>
+          </div>
+        </div>
+        <button class="tool-btn" style="margin-top:1rem" id="fix-btn" onclick="runFix()">Fix My Code →</button>
+      </div>
+
+      <!-- GENERATE TAB -->
+      <div class="tab-content" id="tab-generate">
+        <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem;">Describe what you need in plain English and
+          get working code.</p>
+        <div class="gen-row">
+          <input type="text" class="prompt-input" id="gen-input"
+            placeholder="e.g. A function that fetches weather data from an API and caches it for 10 minutes" />
+          <select class="lang-select" id="gen-lang">
+            <option>JavaScript</option>
+            <option>Python</option>
+            <option>TypeScript</option>
+            <option>Go</option>
+            <option>Rust</option>
+            <option>PHP</option>
+          </select>
+          <button class="tool-btn" id="gen-btn" onclick="runGenerate()">Generate →</button>
+        </div>
+        <div class="ai-output" id="gen-output"
+          style="font-family:'JetBrains Mono',monospace;font-size:.82rem;min-height:180px"><span
+            class="placeholder">Generated code will appear here…</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <h2>Everything you need to <span>code smarter</span></h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Code Explanation</h3>
+        <p>Understand any codebase instantly — from complex algorithms to unfamiliar frameworks.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🐛</div>
+        <h3>AI Bug Fixer</h3>
+        <p>Paste broken code and get corrected, explained fixes with reasoning behind every change.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Code Generator</h3>
+        <p>Describe what you want in plain English. Get clean, working code in any language.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Security Review</h3>
+        <p>Scan your code for common vulnerabilities — SQL injection, XSS, exposed secrets, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Docstring Writer</h3>
+        <p>Automatically generate clear, professional documentation comments for your functions and classes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Code Refactoring</h3>
+        <p>Get suggestions to make your code cleaner, faster, and more maintainable.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <h2>Simple, honest pricing</h2>
+    <p>Start free. Scale when you're ready. No hidden fees.</p>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>$</sup>0<sub>/mo</sub></div>
+        <ul>
+          <li>20 AI requests/day</li>
+          <li>Code Explain & Fix</li>
+          <li>JavaScript & Python</li>
+          <li>Community support</li>
+        </ul>
+        <button class="plan-btn outline">Get Started Free</button>
+      </div>
+      <div class="plan popular">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><sup>$</sup>19<sub>/mo</sub></div>
+        <ul>
+          <li>Unlimited AI requests</li>
+          <li>All 6 AI tools</li>
+          <li>All languages supported</li>
+          <li>Priority AI responses</li>
+          <li>History & saved snippets</li>
+          <li>Email support</li>
+        </ul>
+        <button class="plan-btn filled">Start Pro Trial</button>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Team</div>
+        <div class="plan-price"><sup>$</sup>49<sub>/mo</sub></div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Up to 10 team members</li>
+          <li>Shared snippet library</li>
+          <li>API access</li>
+          <li>Dedicated Slack support</li>
+        </ul>
+        <button class="plan-btn outline">Contact Sales</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">Dev<span style="color:var(--text)">Mind</span><span style="color:var(--accent2)">.</span>ai</div>
+    <p style="margin-top:.4rem">Built for developers, powered by Claude AI.</p>
+    <p style="margin-top:.25rem;font-size:.78rem">© 2026 DevMind AI. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // ── Tab switcher ──
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // ── Claude API caller ──
+    async function callClaude(userPrompt, systemPrompt = '') {
+      const messages = [{ role: 'user', content: userPrompt }];
+      const body = {
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages
+      };
+      if (systemPrompt) body.system = systemPrompt;
+
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+      return data.content?.map(b => b.text || '').join('') || 'No response.';
+    }
+
+    function setLoading(outputId, btnId, loading) {
+      const out = document.getElementById(outputId);
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        out.innerHTML = '<span class="spinner"></span> AI is thinking…';
+        btn.disabled = true;
+      } else {
+        btn.disabled = false;
+      }
+    }
+
+    // ── Explain Code ──
+    async function runExplain() {
+      const code = document.getElementById('explain-input').value.trim();
+      if (!code) return;
+      setLoading('explain-output', 'explain-btn', true);
+      try {
+        const result = await callClaude(
+          `Explain this code clearly for a developer. Describe what it does, how it works, and any important concepts:\n\n${code}`,
+          'You are a senior software engineer. Explain code clearly and concisely in plain English. No markdown headers. Just 2-4 paragraphs.'
+        );
+        document.getElementById('explain-output').textContent = result;
+      } catch (e) {
+        document.getElementById('explain-output').textContent = 'Error: ' + e.message;
+      }
+      setLoading('explain-output', 'explain-btn', false);
+    }
+
+    // ── Fix Bugs ──
+    async function runFix() {
+      const code = document.getElementById('fix-input').value.trim();
+      if (!code) return;
+      setLoading('fix-output', 'fix-btn', true);
+      try {
+        const result = await callClaude(
+          `Find and fix any bugs in this code. Return ONLY the corrected code followed by a short comment explaining what was fixed:\n\n${code}`,
+          'You are a senior software engineer. Return the fixed code as plain text (no markdown code blocks), then a brief note starting with "// Fixed:" explaining the changes.'
+        );
+        document.getElementById('fix-output').textContent = result;
+      } catch (e) {
+        document.getElementById('fix-output').textContent = 'Error: ' + e.message;
+      }
+      setLoading('fix-output', 'fix-btn', false);
+    }
+
+    // ── Generate Code ──
+    async function runGenerate() {
+      const prompt = document.getElementById('gen-input').value.trim();
+      const lang = document.getElementById('gen-lang').value;
+      if (!prompt) return;
+      setLoading('gen-output', 'gen-btn', true);
+      try {
+        const result = await callClaude(
+          `Generate clean, production-ready ${lang} code for: ${prompt}`,
+          `You are a senior ${lang} developer. Write clean, well-commented ${lang} code. Return only the code as plain text, no markdown code fences. Add brief inline comments.`
+        );
+        document.getElementById('gen-output').textContent = result;
+      } catch (e) {
+        document.getElementById('gen-output').textContent = 'Error: ' + e.message;
+      }
+      setLoading('gen-output', 'gen-btn', false);
+    }
+  </script>
+</body>
+
+</html>
